@@ -3,54 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Department Live Dashboard</title>
+  <title>Department Staff Live Ranking</title>
   <style>
     * {
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     body {
-      background-color: #0f172a;
-      color: #f8fafc;
+      background-color: #0d1117;
+      color: #c9d1d9;
       margin: 0;
       padding: 20px 15px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
     }
     .container {
       width: 100%;
       max-width: 480px;
     }
-    
-    /* Login Box Style */
+
+    /* LOGIN STYLES */
     #login-box {
-      background: #1e293b;
+      background: #161b22;
       padding: 25px 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      border: 1px solid #30363d;
       text-align: center;
+      margin-top: 40px;
     }
     #login-box h2 {
       margin-top: 0;
-      color: #38bdf8;
+      color: #58a6ff;
     }
     .input-field {
       width: 100%;
       padding: 12px;
       margin: 10px 0;
       border-radius: 8px;
-      border: 1px solid #334155;
-      background: #0f172a;
+      border: 1px solid #30363d;
+      background: #0d1117;
       color: #fff;
       font-size: 16px;
-      box-sizing: border-box;
     }
     .btn {
       width: 100%;
       padding: 12px;
-      background: #2563eb;
+      background: #238636;
       border: none;
       border-radius: 8px;
       color: white;
@@ -59,48 +59,62 @@
       cursor: pointer;
       margin-top: 10px;
     }
-    .btn:hover {
-      background: #1d4ed8;
-    }
-    #error-msg {
-      color: #ef4444;
-      font-size: 14px;
-      margin-top: 10px;
-      display: none;
-    }
+    .btn:hover { background: #2ea043; }
+    #error-msg { color: #f85149; font-size: 14px; margin-top: 10px; display: none; }
 
-    /* Dashboard Style */
-    #dashboard {
-      display: none;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      color: #38bdf8;
-      font-size: 22px;
-      margin: 0 0 5px 0;
-    }
-    .header p {
-      color: #94a3b8;
-      font-size: 13px;
-      margin: 0;
-    }
-    .edit-sheet-btn {
+    /* DASHBOARD STYLES */
+    #dashboard { display: none; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { color: #58a6ff; font-size: 22px; margin: 0 0 5px 0; }
+    .header p { color: #8b949e; font-size: 13px; margin: 0; }
+    
+    .edit-btn {
       display: block;
       width: 100%;
       text-align: center;
-      background: #059669;
+      background: #1f6feb;
       color: white;
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
       margin-bottom: 20px;
     }
-    .edit-sheet-btn:hover {
-      background: #047857;
+
+    /* CARD STYLES */
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: #30363d;
+    }
+    .card.top1::before { background: #f1e05a; } /* Gold */
+    .card.top2::before { background: #a5d6ff; } /* Silver */
+    .card.top3::before { background: #ffa657; } /* Bronze */
+
+    .rank-name { display: flex; align-items: center; gap: 12px; }
+    .rank-num { font-weight: bold; color: #8b949e; font-size: 16px; min-width: 30px; }
+    .branch-name { font-size: 17px; font-weight: 600; color: #f0f6fc; }
+    .count-badge {
+      background: #1f6feb;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 6px 14px;
+      border-radius: 20px;
     }
   </style>
 </head>
@@ -108,30 +122,30 @@
 
 <div class="container">
 
-  <!-- LOGIN FORM -->
+  <!-- LOGIN BOX -->
   <div id="login-box">
     <h2>Login Required</h2>
-    <p style="color: #94a3b8; font-size: 14px;">Enter ID & Password to access dashboard</p>
+    <p style="color: #8b949e; font-size: 14px;">Enter credentials to view live ranking</p>
     <input type="text" id="username" class="input-field" placeholder="User ID">
     <input type="password" id="password" class="input-field" placeholder="Password">
     <button class="btn" onclick="checkLogin()">Login</button>
-    <p id="error-msg">Incorrect User ID or Password!</p>
+    <p id="error-msg">Invalid User ID or Password!</p>
   </div>
 
-  <!-- DASHBOARD CONTENT -->
+  <!-- DASHBOARD -->
   <div id="dashboard">
     <div class="header">
       <h1>Department Staff Live Ranking</h1>
-      <p>Automatic Ranking Based on Staff Count</p>
+      <p>Automatic Ranking Based on Google Sheet</p>
     </div>
 
-    <!-- LINK TO GOOGLE SHEET FOR EDITING -->
-    <a href="APNI_GOOGLE_SHEET_LINK_YAHAN_PASTE_KAREIN" target="_blank" class="edit-sheet-btn">
-      ✏️ Open Google Sheet to Edit Data
+    <a href="https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/edit" target="_blank" class="edit-btn">
+      ✏️ Edit Data in Google Sheet
     </a>
 
-    <!-- Rankings Will Show Here -->
-    <p style="text-align:center; color:#94a3b8;">Dashboard unlocked successfully!</p>
+    <div class="card-list" id="ranking-list">
+      <p style="text-align:center;">Loading live data...</p>
+    </div>
   </div>
 
 </div>
@@ -141,13 +155,65 @@
     var user = document.getElementById("username").value;
     var pass = document.getElementById("password").value;
 
-    // Yahan apna ID aur Password set karein:
-    if (user === "admin" && pass === "12345") {
+    // Default Login: ID = admin, Password = 123
+    if (user === "admin" && pass === "123") {
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
+      fetchSheetData();
     } else {
       document.getElementById("error-msg").style.display = "block";
     }
+  }
+
+  function fetchSheetData() {
+    // Google Sheet Published CSV URL
+    const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/pub?output=csv";
+
+    fetch("https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/gviz/tq?tqx=out:csv")
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').map(row => row.split(','));
+        let branchesData = [];
+
+        // Skip Header row (i = 1)
+        for (let i = 1; i < rows.length; i++) {
+          if (rows[i].length >= 2) {
+            let name = rows[i][0].replace(/"/g, '').trim();
+            let count = parseInt(rows[i][1].replace(/"/g, '').trim()) || 0;
+            if (name) {
+              branchesData.push({ name, count });
+            }
+          }
+        }
+
+        // Higher count = Higher rank
+        branchesData.sort((a, b) => b.count - a.count);
+
+        const listContainer = document.getElementById("ranking-list");
+        listContainer.innerHTML = "";
+
+        branchesData.forEach((item, index) => {
+          let topClass = "";
+          if (index === 0) topClass = "top1";
+          else if (index === 1) topClass = "top2";
+          else if (index === 2) topClass = "top3";
+
+          const card = document.createElement("div");
+          card.className = `card ${topClass}`;
+          card.innerHTML = `
+            <div class="rank-name">
+              <span class="rank-num">#${index + 1}</span>
+              <span class="branch-name">${item.name}</span>
+            </div>
+            <div class="count-badge">${item.count}</div>
+          `;
+          listContainer.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red;'>Failed to load Google Sheet data. Please check sheet permission.</p>";
+      });
   }
 </script>
 
