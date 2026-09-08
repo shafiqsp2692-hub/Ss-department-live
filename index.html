@@ -1,1 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Live Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 15px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 20px;
+            color: #38bdf8;
+            margin: 0 0 5px 0;
+        }
+        .header p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 0;
+        }
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #38bdf8;
+        }
+        .card.top-1 { border-left-color: #facc15; }
+        .card.top-2 { border-left-color: #94a3b8; }
+        .card.top-3 { border-left-color: #b45309; }
 
+        .rank-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .rank {
+            font-size: 16px;
+            font-weight: bold;
+            background: #334155;
+            color: #f8fafc;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .branch-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .count-badge {
+            background: #0284c7;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Department Staff Live Ranking</h1>
+        <p>Automatic Ranking Based on Staff Count</p>
+    </div>
+
+    <div class="card-list" id="dashboard"></div>
+
+    <script>
+        let branchesData = [
+            { name: "Modasa", count: 25 },
+            { name: "Bhiloda", count: 18 },
+            { name: "Bayad", count: 30 },
+            { name: "Dhansura", count: 12 },
+            { name: "Malpur", count: 22 },
+            { name: "Meghraj", count: 15 },
+            { name: "Himmatnagar", count: 40 },
+            { name: "Idar", count: 28 },
+            { name: "Khedbrahma", count: 10 },
+            { name: "Vadali", count: 14 },
+            { name: "Talod", count: 19 },
+            { name: "Prantij", count: 26 }
+        ];
+
+        branchesData.sort((a, b) => b.count - a.count);
+
+        const container = document.getElementById('dashboard');
+        
+        branchesData.forEach((item, index) => {
+            let rankClass = '';
+            if (index === 0) rankClass = 'top-1';
+            else if (index === 1) rankClass = 'top-2';
+            else if (index === 2) rankClass = 'top-3';
+
+            const cardHTML = `
+                <div class="card ${rankClass}">
+                    <div class="rank-name">
+                        <div class="rank">#${index + 1}</div>
+                        <div class="branch-name">${item.name}</div>
+                    </div>
+                    <div class="count-badge">${item.count}</div>
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
+    </script>
+
+</body>
+</html>
