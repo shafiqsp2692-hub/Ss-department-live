@@ -69,7 +69,7 @@
     .header p { color: #8b949e; font-size: 13px; margin: 0; }
     
     .edit-btn {
-      display: block;
+      display: none; /* Default Hidden */
       width: 100%;
       text-align: center;
       background: #1f6feb;
@@ -139,7 +139,8 @@
       <p>Automatic Ranking Based on Google Sheet</p>
     </div>
 
-    <a href="https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/edit" target="_blank" class="edit-btn">
+    <!-- EDIT BUTTON (SHOWS ONLY FOR ADMIN) -->
+    <a id="edit-link" href="https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/edit" target="_blank" class="edit-btn">
       ✏️ Edit Data in Google Sheet
     </a>
 
@@ -152,30 +153,35 @@
 
 <script>
   function checkLogin() {
-    var user = document.getElementById("username").value;
-    var pass = document.getElementById("password").value;
+    var user = document.getElementById("username").value.trim();
+    var pass = document.getElementById("password").value.trim();
 
-    // Default Login: ID = admin, Password = 123
+    // ADMIN LOGIN
     if (user === "admin" && pass === "123") {
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
+      document.getElementById("edit-link").style.display = "block"; // Show Edit Button
       fetchSheetData();
-    } else {
+    } 
+    // STAFF MEMBER LOGIN
+    else if (user === "staff" && pass === "1234") {
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("edit-link").style.display = "none"; // Hide Edit Button
+      fetchSheetData();
+    } 
+    else {
       document.getElementById("error-msg").style.display = "block";
     }
   }
 
   function fetchSheetData() {
-    // Google Sheet Published CSV URL
-    const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/pub?output=csv";
-
     fetch("https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/gviz/tq?tqx=out:csv")
       .then(response => response.text())
       .then(csvText => {
         const rows = csvText.split('\n').map(row => row.split(','));
         let branchesData = [];
 
-        // Skip Header row (i = 1)
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
             let name = rows[i][0].replace(/"/g, '').trim();
@@ -186,7 +192,6 @@
           }
         }
 
-        // Higher count = Higher rank
         branchesData.sort((a, b) => b.count - a.count);
 
         const listContainer = document.getElementById("ranking-list");
@@ -212,7 +217,7 @@
       })
       .catch(err => {
         console.error(err);
-        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red;'>Failed to load Google Sheet data. Please check sheet permission.</p>";
+        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red;'>Failed to load Google Sheet data.</p>";
       });
   }
 </script>
