@@ -129,7 +129,33 @@
       text-align: center;
       position: relative;
     }
-    .box-card.top1 { border: 2px solid #f1e05a; background: #1c1a0e; }
+
+    /* SPECIAL STYLING FOR TOP 1 (FIRST RANK) */
+    .box-card.top1 {
+      grid-column: span 2;
+      border: 2px solid #ffd700;
+      background: linear-gradient(135deg, #2a2100 0%, #161b22 100%);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
+      padding: 20px 15px;
+    }
+    .box-card.top1 .rank-num {
+      color: #ffd700;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .box-card.top1 .branch-name {
+      font-size: 18px;
+      color: #fff;
+    }
+    .box-card.top1 .count-badge {
+      background: linear-gradient(90deg, #ffb703, #fb8500);
+      color: #000;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    /* TOP 2 & TOP 3 STYLES */
     .box-card.top2 { border: 2px solid #a5d6ff; background: #0f1824; }
     .box-card.top3 { border: 2px solid #ffa657; background: #1f160e; }
 
@@ -159,6 +185,40 @@
       color: #3fb950;
       font-weight: 600;
       margin-top: 6px;
+    }
+
+    /* POPUP CONGRATULATIONS BANNER AT BOTTOM */
+    #congrats-toast {
+      position: fixed;
+      bottom: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 450px;
+      background: linear-gradient(135deg, #ffb703, #fb8500);
+      color: #000;
+      padding: 14px 18px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+      text-align: center;
+      font-weight: bold;
+      z-index: 9999;
+      transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
+      opacity: 0;
+    }
+    #congrats-toast.show {
+      bottom: 25px;
+      opacity: 1;
+    }
+    .toast-title {
+      font-size: 15px;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .toast-msg {
+      font-size: 14px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -201,6 +261,12 @@
     </div>
   </div>
 
+</div>
+
+<!-- BOTTOM CONGRATULATIONS POPUP -->
+<div id="congrats-toast">
+  <div class="toast-title">🎉 BOHOT BOHOT MUBARAKBAAD! 🎉</div>
+  <div class="toast-msg" id="toast-text">#1 Rank aane par Mubarakbaad!</div>
 </div>
 
 <script>
@@ -288,20 +354,40 @@
 
     filtered.forEach((item, index) => {
       let topClass = "";
-      if (index === 0) topClass = "top1";
+      let rankText = `#${index + 1}`;
+
+      if (index === 0) {
+        topClass = "top1";
+        rankText = "👑 #1 TOP RANK";
+        triggerCongratsToast(item.name);
+      }
       else if (index === 1) topClass = "top2";
       else if (index === 2) topClass = "top3";
 
       const card = document.createElement("div");
       card.className = `box-card ${topClass}`;
       card.innerHTML = `
-        <div class="rank-num">#${index + 1}</div>
+        <div class="rank-num">${rankText}</div>
         <div class="branch-name">${item.name}</div>
         <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
         ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
       `;
       listContainer.appendChild(card);
     });
+  }
+
+  function triggerCongratsToast(winnerName) {
+    const toast = document.getElementById("congrats-toast");
+    const toastText = document.getElementById("toast-text");
+    
+    toastText.innerText = `${winnerName} ko #1 Rank aane par bohot bohot mubarakbaad!`;
+    
+    toast.classList.add("show");
+
+    // Hide automatically after 10 seconds (10000 ms)
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 10000);
   }
 </script>
 
