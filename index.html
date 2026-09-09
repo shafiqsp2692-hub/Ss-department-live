@@ -70,7 +70,7 @@
 
     /* DASHBOARD STYLES */
     #dashboard { display: none; }
-    .header { text-align: center; margin-bottom: 20px; }
+    .header { text-align: center; margin-bottom: 15px; }
     .header h1 { color: #58a6ff; font-size: 22px; margin: 0 0 5px 0; }
     .header p { color: #8b949e; font-size: 13px; margin: 0; }
     
@@ -84,7 +84,31 @@
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+    }
+
+    /* CATEGORY TAB BUTTONS */
+    .tab-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: #161b22;
+      color: #8b949e;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #238636;
+      color: #ffffff;
+      border-color: #2ea043;
     }
 
     /* BOX / GRID STYLES (2 COLUMNS) */
@@ -164,6 +188,13 @@
       ✏️ Edit Data in Google Sheet
     </a>
 
+    <!-- FILTER TABS -->
+    <div class="tab-container">
+      <button id="tab-all" class="tab-btn active" onclick="filterCategory('ALL')">ALL</button>
+      <button id="tab-short" class="tab-btn" onclick="filterCategory('SHORT TIME')">SHORT TIME</button>
+      <button id="tab-full" class="tab-btn" onclick="filterCategory('FULL TIME')">FULL TIME</button>
+    </div>
+
     <!-- 2 COLUMN BOX GRID -->
     <div class="card-grid" id="ranking-list">
       <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
@@ -173,6 +204,9 @@
 </div>
 
 <script>
+  let allData = [];
+  let currentCategory = 'ALL';
+
   function checkLogin() {
     var user = document.getElementById("username").value.trim();
     var pass = document.getElementById("password").value.trim();
@@ -199,46 +233,75 @@
       .then(response => response.text())
       .then(csvText => {
         const rows = csvText.split('\n').map(row => row.split(','));
-        let branchesData = [];
+        allData = [];
 
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
             let name = rows[i][0] ? rows[i][0].replace(/"/g, '').trim() : '';
             let count = rows[i][1] ? parseInt(rows[i][1].replace(/"/g, '').trim()) || 0 : 0;
             let unit = rows[i][2] ? rows[i][2].replace(/"/g, '').trim() : '';
+            let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
             
             if (name) {
-              branchesData.push({ name, count, unit });
+              allData.push({ name, count, unit, category });
             }
           }
         }
 
-        branchesData.sort((a, b) => b.count - a.count);
-
-        const listContainer = document.getElementById("ranking-list");
-        listContainer.innerHTML = "";
-
-        branchesData.forEach((item, index) => {
-          let topClass = "";
-          if (index === 0) topClass = "top1";
-          else if (index === 1) topClass = "top2";
-          else if (index === 2) topClass = "top3";
-
-          const card = document.createElement("div");
-          card.className = `box-card ${topClass}`;
-          card.innerHTML = `
-            <div class="rank-num">#${index + 1}</div>
-            <div class="branch-name">${item.name}</div>
-            <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
-            ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
-          `;
-          listContainer.appendChild(card);
-        });
+        renderCards();
       })
       .catch(err => {
         console.error(err);
         document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red; grid-column: span 2;'>Failed to load Google Sheet data.</p>";
       });
+  }
+
+  function filterCategory(cat) {
+    currentCategory = cat;
+    
+    document.getElementById("tab-all").classList.remove("active");
+    document.getElementById("tab-short").classList.remove("active");
+    document.getElementById("tab-full").classList.remove("active");
+
+    if (cat === 'ALL') document.getElementById("tab-all").classList.add("active");
+    if (cat === 'SHORT TIME') document.getElementById("tab-short").classList.add("active");
+    if (cat === 'FULL TIME') document.getElementById("tab-full").classList.add("active");
+
+    renderCards();
+  }
+
+  function renderCards() {
+    let filtered = allData;
+    if (currentCategory !== 'ALL') {
+      filtered = allData.filter(item => item.category === currentCategory);
+    }
+
+    filtered.sort((a, b) => b.count - a.count);
+
+    const listContainer = document.getElementById("ranking-list");
+    listContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = "<p style='text-align:center; grid-column: span 2; color:#8b949e;'>No entries found in this category.</p>";
+      return;
+    }
+
+    filtered.forEach((item, index) => {
+      let topClass = "";
+      if (index === 0) topClass = "top1";
+      else if (index === 1) topClass = "top2";
+      else if (index === 2) topClass = "top3";
+
+      const card = document.createElement("div");
+      card.className = `box-card ${topClass}`;
+      card.innerHTML = `
+        <div class="rank-num">#${index + 1}</div>
+        <div class="branch-name">${item.name}</div>
+        <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
+        ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
+      `;
+      listContainer.appendChild(card);
+    });
   }
 </script>
 
