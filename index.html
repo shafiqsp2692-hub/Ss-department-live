@@ -87,6 +87,40 @@
       margin-bottom: 15px;
     }
 
+    /* TOTAL PERFORMANCE SUMMARY CARD */
+    .summary-card {
+      background: #161b22;
+      border: 1px solid #238636;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(35, 134, 54, 0.2);
+    }
+    .summary-title {
+      font-size: 13px;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .summary-total {
+      font-size: 24px;
+      color: #3fb950;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .summary-details {
+      font-size: 13px;
+      color: #c9d1d9;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #30363d;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
     /* CATEGORY TAB BUTTONS */
     .tab-container {
       display: flex;
@@ -255,6 +289,16 @@
       <button id="tab-full" class="tab-btn" onclick="filterCategory('FULL TIME')">FULL TIME</button>
     </div>
 
+    <!-- TOTAL PERFORMANCE SUMMARY -->
+    <div class="summary-card" id="summary-box">
+      <div class="summary-title" id="summary-cat-title">TOTAL KAARKARDAGI (ALL)</div>
+      <div class="summary-total" id="total-amount">₹0</div>
+      <div class="summary-details">
+        <span>👥 Total Staff: <strong id="total-staff" style="color:#58a6ff;">0</strong></span>
+        <span>📦 Total Units: <strong id="total-units" style="color:#ffb703;">0</strong></span>
+      </div>
+    </div>
+
     <!-- 2 COLUMN BOX GRID -->
     <div class="card-grid" id="ranking-list">
       <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
@@ -305,7 +349,7 @@
           if (rows[i].length >= 2) {
             let name = rows[i][0] ? rows[i][0].replace(/"/g, '').trim() : '';
             let count = rows[i][1] ? parseInt(rows[i][1].replace(/"/g, '').trim()) || 0 : 0;
-            let unit = rows[i][2] ? rows[i][2].replace(/"/g, '').trim() : '';
+            let unit = rows[i][2] ? parseFloat(rows[i][2].replace(/"/g, '').trim()) || 0 : 0;
             let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
             
             if (name) {
@@ -341,6 +385,19 @@
     if (currentCategory !== 'ALL') {
       filtered = allData.filter(item => item.category === currentCategory);
     }
+
+    // CALCULATE TOTALS FOR SELECTED CATEGORY
+    let totalAmt = 0;
+    let totalUn = 0;
+    filtered.forEach(item => {
+      totalAmt += item.count;
+      totalUn += item.unit;
+    });
+
+    document.getElementById("summary-cat-title").innerText = `TOTAL KAARKARDAGI (${currentCategory})`;
+    document.getElementById("total-amount").innerText = `₹${totalAmt.toLocaleString('en-IN')}`;
+    document.getElementById("total-staff").innerText = filtered.length;
+    document.getElementById("total-units").innerText = totalUn.toFixed(2);
 
     filtered.sort((a, b) => b.count - a.count);
 
@@ -384,7 +441,6 @@
     
     toast.classList.add("show");
 
-    // Hide automatically after 10 seconds (10000 ms)
     setTimeout(() => {
       toast.classList.remove("show");
     }, 10000);
