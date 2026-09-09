@@ -119,16 +119,22 @@
       font-size: 15px;
       font-weight: 600;
       color: #f0f6fc;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       word-break: break-word;
     }
     .count-badge {
       background: #1f6feb;
       color: #ffffff;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
       padding: 4px 12px;
       border-radius: 15px;
+    }
+    .unit-text {
+      font-size: 13px;
+      color: #3fb950;
+      font-weight: 600;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -197,10 +203,12 @@
 
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
-            let name = rows[i][0].replace(/"/g, '').trim();
-            let count = parseInt(rows[i][1].replace(/"/g, '').trim()) || 0;
+            let name = rows[i][0] ? rows[i][0].replace(/"/g, '').trim() : '';
+            let count = rows[i][1] ? parseInt(rows[i][1].replace(/"/g, '').trim()) || 0 : 0;
+            let unit = rows[i][2] ? rows[i][2].replace(/"/g, '').trim() : '';
+            
             if (name) {
-              branchesData.push({ name, count });
+              branchesData.push({ name, count, unit });
             }
           }
         }
@@ -221,7 +229,8 @@
           card.innerHTML = `
             <div class="rank-num">#${index + 1}</div>
             <div class="branch-name">${item.name}</div>
-            <div class="count-badge">${item.count}</div>
+            <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
+            ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
           `;
           listContainer.appendChild(card);
         });
