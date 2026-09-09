@@ -13,7 +13,7 @@
       background-color: #0d1117;
       color: #c9d1d9;
       margin: 0;
-      padding: 20px 15px;
+      padding: 20px 10px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -21,7 +21,7 @@
     }
     .container {
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
     }
 
     /* LOGIN STYLES */
@@ -69,7 +69,7 @@
     .header p { color: #8b949e; font-size: 13px; margin: 0; }
     
     .edit-btn {
-      display: none; /* Default Hidden */
+      display: none;
       width: 100%;
       text-align: center;
       background: #1f6feb;
@@ -81,40 +81,48 @@
       margin-bottom: 20px;
     }
 
-    /* CARD STYLES */
-    .card-list { display: flex; flex-direction: column; gap: 12px; }
-    .card {
+    /* BOX / GRID STYLES (2 COLUMNS) */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .box-card {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 15px 10px;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      text-align: center;
       position: relative;
-      overflow: hidden;
     }
-    .card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 6px;
-      background: #30363d;
-    }
-    .card.top1::before { background: #f1e05a; } /* Gold */
-    .card.top2::before { background: #a5d6ff; } /* Silver */
-    .card.top3::before { background: #ffa657; } /* Bronze */
+    .box-card.top1 { border: 2px solid #f1e05a; background: #1c1a0e; }
+    .box-card.top2 { border: 2px solid #a5d6ff; background: #0f1824; }
+    .box-card.top3 { border: 2px solid #ffa657; background: #1f160e; }
 
-    .rank-name { display: flex; align-items: center; gap: 12px; }
-    .rank-num { font-weight: bold; color: #8b949e; font-size: 16px; min-width: 30px; }
-    .branch-name { font-size: 17px; font-weight: 600; color: #f0f6fc; }
+    .rank-num {
+      font-size: 13px;
+      font-weight: bold;
+      color: #8b949e;
+      margin-bottom: 5px;
+    }
+    .branch-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
     .count-badge {
       background: #1f6feb;
       color: #ffffff;
       font-weight: bold;
       font-size: 16px;
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 4px 12px;
+      border-radius: 15px;
     }
   </style>
 </head>
@@ -139,13 +147,14 @@
       <p>Automatic Ranking Based on Google Sheet</p>
     </div>
 
-    <!-- EDIT BUTTON (SHOWS ONLY FOR ADMIN) -->
+    <!-- EDIT LINK FOR ADMIN -->
     <a id="edit-link" href="https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/edit" target="_blank" class="edit-btn">
       ✏️ Edit Data in Google Sheet
     </a>
 
-    <div class="card-list" id="ranking-list">
-      <p style="text-align:center;">Loading live data...</p>
+    <!-- 2 COLUMN BOX GRID -->
+    <div class="card-grid" id="ranking-list">
+      <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
     </div>
   </div>
 
@@ -156,18 +165,16 @@
     var user = document.getElementById("username").value.trim();
     var pass = document.getElementById("password").value.trim();
 
-    // ADMIN LOGIN
     if (user === "admin" && pass === "123") {
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
-      document.getElementById("edit-link").style.display = "block"; // Show Edit Button
+      document.getElementById("edit-link").style.display = "block";
       fetchSheetData();
     } 
-    // STAFF MEMBER LOGIN
     else if (user === "staff" && pass === "1234") {
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
-      document.getElementById("edit-link").style.display = "none"; // Hide Edit Button
+      document.getElementById("edit-link").style.display = "none";
       fetchSheetData();
     } 
     else {
@@ -204,12 +211,10 @@
           else if (index === 2) topClass = "top3";
 
           const card = document.createElement("div");
-          card.className = `card ${topClass}`;
+          card.className = `box-card ${topClass}`;
           card.innerHTML = `
-            <div class="rank-name">
-              <span class="rank-num">#${index + 1}</span>
-              <span class="branch-name">${item.name}</span>
-            </div>
+            <div class="rank-num">#${index + 1}</div>
+            <div class="branch-name">${item.name}</div>
             <div class="count-badge">${item.count}</div>
           `;
           listContainer.appendChild(card);
@@ -217,7 +222,7 @@
       })
       .catch(err => {
         console.error(err);
-        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red;'>Failed to load Google Sheet data.</p>";
+        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red; grid-column: span 2;'>Failed to load Google Sheet data.</p>";
       });
   }
 </script>
