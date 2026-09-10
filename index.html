@@ -1,17 +1,455 @@
-    /* SLIM & TRANSPARENT BOTTOM TICKER LINE */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modasa Telethon 2026</title>
+
+  <!-- Social Media Link Preview Meta Tags -->
+  <meta property="og:title" content="Modasa Telethon 2026" />
+  <meta property="og:description" content="Live Department Staff Ranking Dashboard" />
+  <meta property="og:type" content="website" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      margin: 0;
+      padding: 20px 10px 45px 10px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* LOGIN STYLES */
+    #login-box {
+      background: #161b22;
+      padding: 25px 20px;
+      border-radius: 12px;
+      border: 1px solid #30363d;
+      text-align: center;
+      margin-top: 40px;
+    }
+    #login-box h2 {
+      margin-top: 0;
+      color: #58a6ff;
+    }
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+      color: #fff;
+      font-size: 16px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #238636;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover { background: #2ea043; }
+    #error-msg { color: #f85149; font-size: 14px; margin-top: 10px; display: none; }
+
+    /* DASHBOARD STYLES */
+    #dashboard { display: none; }
+    .header { text-align: center; margin-bottom: 15px; }
+    .header h1 { color: #58a6ff; font-size: 22px; margin: 0 0 5px 0; }
+    .header p { color: #8b949e; font-size: 13px; margin: 0; }
+    
+    .edit-btn {
+      display: none;
+      width: 100%;
+      text-align: center;
+      background: #1f6feb;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    /* SUMMARY CARD */
+    .summary-card {
+      background: #161b22;
+      border: 1px solid #238636;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(35, 134, 54, 0.2);
+    }
+    .summary-title {
+      font-size: 13px;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .summary-total {
+      font-size: 24px;
+      color: #3fb950;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .summary-details {
+      font-size: 13px;
+      color: #c9d1d9;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #30363d;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    /* CATEGORY TAB BUTTONS */
+    .tab-container {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 15px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 4px;
+      background: #161b22;
+      color: #8b949e;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #238636;
+      color: #ffffff;
+      border-color: #2ea043;
+    }
+
+    /* BOX / GRID STYLES */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .box-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 15px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    /* SPECIAL STYLING FOR TOP 1 (FIRST RANK) */
+    .box-card.top1 {
+      grid-column: span 2;
+      border: 2px solid #ffd700;
+      background: linear-gradient(135deg, #2a2100 0%, #161b22 100%);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
+      padding: 20px 15px;
+    }
+    .box-card.top1 .rank-num {
+      color: #ffd700;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .box-card.top1 .branch-name {
+      font-size: 18px;
+      color: #fff;
+    }
+    .box-card.top1 .count-badge {
+      background: linear-gradient(90deg, #ffb703, #fb8500);
+      color: #000;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .mubarak-text {
+      color: #ffb703;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    /* TOP 2 & TOP 3 STYLES */
+    .box-card.top2 { border: 2px solid #a5d6ff; background: #0f1824; }
+    .box-card.top3 { border: 2px solid #ffa657; background: #1f160e; }
+
+    .rank-num {
+      font-size: 13px;
+      font-weight: bold;
+      color: #8b949e;
+      margin-bottom: 5px;
+    }
+    .branch-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .count-badge {
+      background: #1f6feb;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 15px;
+      padding: 4px 12px;
+      border-radius: 15px;
+    }
+    .unit-text {
+      font-size: 13px;
+      color: #3fb950;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* SLIM BOTTOM TICKER LINE */
     .ticker-bar {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(255, 183, 3, 0.85); /* Semi-transparent background */
-      backdrop-filter: blur(4px);            /* Blur effect behind the bar */
+      background: #ffb703;
       color: #000;
       font-weight: bold;
-      font-size: 11px;                       /* Sleek & smaller font */
-      padding: 3px 0;                        /* Thin bar height */
+      font-size: 12px;
+      padding: 4px 0;
       overflow: hidden;
       white-space: nowrap;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
       z-index: 9999;
     }
+    .ticker-text {
+      display: inline-block;
+      padding-left: 100%;
+      animation: ticker 25s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LOGIN BOX -->
+  <div id="login-box">
+    <h2>Login Required</h2>
+    <p style="color: #8b949e; font-size: 14px;">Enter credentials to view live ranking</p>
+    <input type="text" id="username" class="input-field" placeholder="User ID">
+    <input type="password" id="password" class="input-field" placeholder="Password">
+    <button class="btn" onclick="checkLogin()">Login</button>
+    <p id="error-msg">Invalid User ID or Password!</p>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="header">
+      <h1>Modasa Telethon 2026</h1>
+      <p>Automatic Ranking Based on Google Sheet</p>
+    </div>
+
+    <!-- EDIT LINK FOR ADMIN -->
+    <a id="edit-link" href="https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/edit" target="_blank" class="edit-btn">
+      ✏️ Edit Data in Google Sheet
+    </a>
+
+    <!-- FILTER TABS -->
+    <div class="tab-container">
+      <button id="tab-all" class="tab-btn active" onclick="filterCategory('ALL')">ALL</button>
+      <button id="tab-short" class="tab-btn" onclick="filterCategory('SHORT TIME')">SHORT TIME</button>
+      <button id="tab-full" class="tab-btn" onclick="filterCategory('FULL TIME')">FULL TIME</button>
+      <button id="tab-dp" class="tab-btn" onclick="filterCategory('DP')">DP</button>
+    </div>
+
+    <!-- TOTAL PERFORMANCE SUMMARY -->
+    <div class="summary-card" id="summary-box">
+      <div class="summary-title" id="summary-cat-title">TOTAL KAARKARDAGI (ALL)</div>
+      <div class="summary-total" id="total-amount">₹0</div>
+      <div class="summary-details">
+        <span>👥 Total Staff: <strong id="total-staff" style="color:#58a6ff;">0</strong></span>
+        <span>📦 Total Units: <strong id="total-units" style="color:#ffb703;">0</strong></span>
+      </div>
+    </div>
+
+    <!-- 2 COLUMN BOX GRID -->
+    <div class="card-grid" id="ranking-list">
+      <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM TICKER LINE -->
+<div class="ticker-bar" id="ticker-container" style="display: none;">
+  <div class="ticker-text" id="ticker-content">
+    🎉 Modasa Telethon 2026 Live Updates...
+  </div>
+</div>
+
+<script>
+  let allData = [];
+  let currentCategory = 'ALL';
+
+  function checkLogin() {
+    var user = document.getElementById("username").value.trim();
+    var pass = document.getElementById("password").value.trim();
+
+    if (user === "admin" && pass === "123") {
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("edit-link").style.display = "block";
+      document.getElementById("ticker-container").style.display = "block";
+      fetchSheetData();
+    } 
+    else if (user === "staff" && pass === "1234") {
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("edit-link").style.display = "none";
+      document.getElementById("ticker-container").style.display = "block";
+      fetchSheetData();
+    } 
+    else {
+      document.getElementById("error-msg").style.display = "block";
+    }
+  }
+
+  function fetchSheetData() {
+    fetch("https://docs.google.com/spreadsheets/d/1-7pjYbE3wIA836FOMOcFb10FdtGwQlnHU0y_-jDPIzM/gviz/tq?tqx=out:csv")
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n').map(row => row.split(','));
+        allData = [];
+        let recentUpdates = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          if (rows[i].length >= 2) {
+            let name = rows[i][0] ? rows[i][0].replace(/"/g, '').trim() : '';
+            let count = rows[i][1] ? parseInt(rows[i][1].replace(/"/g, '').trim()) || 0 : 0;
+            let unit = rows[i][2] ? parseFloat(rows[i][2].replace(/"/g, '').trim()) || 0 : 0;
+            let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
+            let recentAdd = rows[i][4] ? parseInt(rows[i][4].replace(/"/g, '').trim()) || 0 : 0;
+            
+            if (name) {
+              allData.push({ name, count, unit, category, recentAdd });
+              if (recentAdd > 0) {
+                recentUpdates.push(`📢 ${name} ne ₹${recentAdd.toLocaleString('en-IN')} jama kiye!`);
+              }
+            }
+          }
+        }
+
+        if (recentUpdates.length > 0) {
+          document.getElementById("ticker-content").innerText = recentUpdates.join("   |   ");
+        } else {
+          document.getElementById("ticker-content").innerText = "🎉 Modasa Telethon 2026 Live Updates & Ranking!";
+        }
+
+        renderCards();
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red; grid-column: span 2;'>Failed to load Google Sheet data.</p>";
+      });
+  }
+
+  function filterCategory(cat) {
+    currentCategory = cat;
+    
+    document.getElementById("tab-all").classList.remove("active");
+    document.getElementById("tab-short").classList.remove("active");
+    document.getElementById("tab-full").classList.remove("active");
+    document.getElementById("tab-dp").classList.remove("active");
+
+    if (cat === 'ALL') document.getElementById("tab-all").classList.add("active");
+    if (cat === 'SHORT TIME') document.getElementById("tab-short").classList.add("active");
+    if (cat === 'FULL TIME') document.getElementById("tab-full").classList.add("active");
+    if (cat === 'DP') document.getElementById("tab-dp").classList.add("active");
+
+    renderCards();
+  }
+
+  function renderCards() {
+    let filtered = allData;
+    if (currentCategory !== 'ALL') {
+      filtered = allData.filter(item => item.category === currentCategory);
+    }
+
+    let totalAmt = 0;
+    let totalUn = 0;
+    filtered.forEach(item => {
+      totalAmt += item.count;
+      totalUn += item.unit;
+    });
+
+    document.getElementById("summary-cat-title").innerText = `TOTAL KAARKARDAGI (${currentCategory})`;
+    document.getElementById("total-amount").innerText = `₹${totalAmt.toLocaleString('en-IN')}`;
+    document.getElementById("total-staff").innerText = filtered.length;
+    document.getElementById("total-units").innerText = totalUn.toFixed(2);
+
+    filtered.sort((a, b) => b.count - a.count);
+
+    const listContainer = document.getElementById("ranking-list");
+    listContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = "<p style='text-align:center; grid-column: span 2; color:#8b949e;'>No entries found in this category.</p>";
+      return;
+    }
+
+    filtered.forEach((item, index) => {
+      let topClass = "";
+      let rankText = `#${index + 1}`;
+      let mubarakHtml = "";
+
+      if (index === 0) {
+        topClass = "top1";
+        rankText = "👑 #1 TOP RANK";
+        mubarakHtml = `<div class="mubarak-text">🎉 Aap ko bohot bohot mubarakbaad! 🎉</div>`;
+      }
+      else if (index === 1) topClass = "top2";
+      else if (index === 2) topClass = "top3";
+
+      const card = document.createElement("div");
+      card.className = `box-card ${topClass}`;
+      card.innerHTML = `
+        <div class="rank-num">${rankText}</div>
+        <div class="branch-name">${item.name}</div>
+        <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
+        ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
+        ${mubarakHtml}
+      `;
+      listContainer.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>
