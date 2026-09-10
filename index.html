@@ -1,26 +1,17 @@
-/* BOTTOM TICKER / MOVING LINE (SLIM & COMPACT VERSION) */
-.ticker-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #ffb703;
-  color: #000;
-  font-weight: 700;
-  font-size: 12px;
-  padding: 4px 0; /* Padding kam karke line ekdum patli kar di hai */
-  overflow: hidden;
-  white-space: nowrap;
-  box-shadow: 0 -1px 6px rgba(0,0,0,0.4);
-  z-index: 9999;
-  line-height: 1.2;
-}
-.ticker-text {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 20s linear infinite;
-}
-@keyframes ticker {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
-}
+    /* SLIM & TRANSPARENT BOTTOM TICKER LINE */
+    .ticker-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 183, 3, 0.85); /* Semi-transparent background */
+      backdrop-filter: blur(4px);            /* Blur effect behind the bar */
+      color: #000;
+      font-weight: bold;
+      font-size: 11px;                       /* Sleek & smaller font */
+      padding: 3px 0;                        /* Thin bar height */
+      overflow: hidden;
+      white-space: nowrap;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
+      z-index: 9999;
+    }
