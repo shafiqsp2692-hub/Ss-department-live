@@ -21,7 +21,7 @@
       background-color: #0d1117;
       color: #c9d1d9;
       margin: 0;
-      padding: 20px 10px 80px 10px;
+      padding: 20px 10px 30px 10px;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -164,6 +164,14 @@
       justify-content: center;
       text-align: center;
       position: relative;
+      transition: all 0.3s ease;
+    }
+
+    /* TODAY UPDATED HIGHLIGHT (LIGHT COLOR BOX) */
+    .box-card.today-updated {
+      background: #1b2a1e !important;
+      border: 1.5px solid #2ea043 !important;
+      box-shadow: 0 0 10px rgba(46, 160, 67, 0.3);
     }
 
     /* SPECIAL STYLING FOR TOP 1 (FIRST RANK) */
@@ -173,6 +181,10 @@
       background: linear-gradient(135deg, #2a2100 0%, #161b22 100%);
       box-shadow: 0 0 15px rgba(255, 215, 0, 0.35);
       padding: 20px 15px;
+    }
+    .box-card.top1.today-updated {
+      background: linear-gradient(135deg, #2a2100 0%, #1b2a1e 100%) !important;
+      border: 2px solid #ffd700 !important;
     }
     .box-card.top1 .rank-num {
       color: #ffd700;
@@ -229,53 +241,14 @@
       font-weight: 600;
       margin-top: 6px;
     }
-
-    /* FLOATING TOAST TICKER (10 SECONDS ANIMATION) */
-    .toast-ticker {
-      position: fixed;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 460px;
-      background: #121d15;
-      border: 1.5px solid #283c2d;
-      border-radius: 14px;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-      z-index: 99999;
-      overflow: hidden;
-    }
-    .toast-bell {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .toast-marquee-wrapper {
-      overflow: hidden;
-      white-space: nowrap;
-      width: 100%;
-    }
-    .toast-marquee-text {
-      display: inline-block;
-      padding-left: 100%;
-      animation: ticker 10s linear infinite;
-      font-size: 13px;
-      color: #d1d5db;
-    }
-    .toast-marquee-text strong {
-      color: #ffffff;
-    }
-    .toast-marquee-text .highlight-amt {
-      color: #e3a008;
+    .today-text {
+      font-size: 12px;
+      color: #2ea043;
       font-weight: bold;
-    }
-
-    @keyframes ticker {
-      0% { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-100%, 0, 0); }
+      margin-top: 6px;
+      background: rgba(46, 160, 67, 0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
     }
   </style>
 </head>
@@ -331,16 +304,6 @@
 
 </div>
 
-<!-- BOTTOM FLOATING TOAST UPDATE -->
-<div class="toast-ticker" id="ticker-container" style="display: none;">
-  <div class="toast-bell">🔔</div>
-  <div class="toast-marquee-wrapper">
-    <div class="toast-marquee-text" id="ticker-content">
-      <strong>Last Update:</strong> Modasa Telethon 2026 Live Updates...
-    </div>
-  </div>
-</div>
-
 <script>
   let allData = [];
   let currentCategory = 'ALL';
@@ -353,14 +316,12 @@
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("edit-link").style.display = "block";
-      document.getElementById("ticker-container").style.display = "flex";
       fetchSheetData();
     } 
     else if (user === "staff" && pass === "1234") {
       document.getElementById("login-box").style.display = "none";
       document.getElementById("dashboard").style.display = "block";
       document.getElementById("edit-link").style.display = "none";
-      document.getElementById("ticker-container").style.display = "flex";
       fetchSheetData();
     } 
     else {
@@ -374,7 +335,6 @@
       .then(csvText => {
         const rows = csvText.split('\n').map(row => row.split(','));
         allData = [];
-        let recentUpdates = [];
 
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
@@ -382,21 +342,12 @@
             let count = rows[i][1] ? parseInt(rows[i][1].replace(/"/g, '').trim()) || 0 : 0;
             let unit = rows[i][2] ? parseFloat(rows[i][2].replace(/"/g, '').trim()) || 0 : 0;
             let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
-            let recentAdd = rows[i][4] ? parseInt(rows[i][4].replace(/"/g, '').trim()) || 0 : 0;
+            let todayAmt = rows[i][4] ? parseInt(rows[i][4].replace(/"/g, '').trim()) || 0 : 0;
             
             if (name) {
-              allData.push({ name, count, unit, category, recentAdd });
-              if (recentAdd > 0) {
-                recentUpdates.push(`${category ? category + ' men ' : ''}<span class="highlight-amt">${recentAdd.toLocaleString('en-IN')} Rs.</span> ${name} ne Jama Karwaye.`);
-              }
+              allData.push({ name, count, unit, category, todayAmt });
             }
           }
-        }
-
-        if (recentUpdates.length > 0) {
-          document.getElementById("ticker-content").innerHTML = `<strong>Last Update:</strong> ` + recentUpdates.join(" &nbsp; | &nbsp; ");
-        } else {
-          document.getElementById("ticker-content").innerHTML = `<strong>Last Update:</strong> Live Updates & Ranking Active.`;
         }
 
         renderCards();
@@ -455,6 +406,7 @@
       let topClass = "";
       let rankText = `#${index + 1}`;
       let mubarakHtml = "";
+      let todayClass = item.todayAmt > 0 ? "today-updated" : "";
 
       if (index === 0) {
         topClass = "top1";
@@ -465,12 +417,13 @@
       else if (index === 2) topClass = "top3";
 
       const card = document.createElement("div");
-      card.className = `box-card ${topClass}`;
+      card.className = `box-card ${topClass} ${todayClass}`;
       card.innerHTML = `
         <div class="rank-num">${rankText}</div>
         <div class="branch-name">${item.name}</div>
         <div class="count-badge">₹${item.count.toLocaleString('en-IN')}</div>
         ${item.unit ? `<div class="unit-text">Unit: ${item.unit}</div>` : ''}
+        ${item.todayAmt > 0 ? `<div class="today-text">Today: +₹${item.todayAmt.toLocaleString('en-IN')}</div>` : ''}
         ${mubarakHtml}
       `;
       listContainer.appendChild(card);
