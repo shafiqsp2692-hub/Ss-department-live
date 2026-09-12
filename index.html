@@ -89,40 +89,6 @@
       margin-bottom: 15px;
     }
 
-    /* SUMMARY CARD */
-    .summary-card {
-      background: #161b22;
-      border: 1px solid #238636;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-      text-align: center;
-      box-shadow: 0 0 10px rgba(35, 134, 54, 0.2);
-    }
-    .summary-title {
-      font-size: 13px;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    .summary-total {
-      font-size: 24px;
-      color: #3fb950;
-      font-weight: 800;
-      margin-bottom: 5px;
-    }
-    .summary-details {
-      font-size: 13px;
-      color: #c9d1d9;
-      display: flex;
-      justify-content: space-around;
-      border-top: 1px solid #30363d;
-      padding-top: 8px;
-      margin-top: 8px;
-    }
-
     /* CATEGORY TAB BUTTONS */
     .tab-container {
       display: flex;
@@ -152,6 +118,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
+      margin-bottom: 15px;
     }
     .box-card {
       background: #161b22;
@@ -250,6 +217,40 @@
       padding: 2px 8px;
       border-radius: 10px;
     }
+
+    /* SUMMARY CARD (MOVED TO BOTTOM) */
+    .summary-card {
+      background: #161b22;
+      border: 1px solid #238636;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(35, 134, 54, 0.2);
+    }
+    .summary-title {
+      font-size: 13px;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .summary-total {
+      font-size: 24px;
+      color: #3fb950;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .summary-details {
+      font-size: 13px;
+      color: #c9d1d9;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #30363d;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -286,7 +287,12 @@
       <button id="tab-dp" class="tab-btn" onclick="filterCategory('DP')">DP</button>
     </div>
 
-    <!-- TOTAL PERFORMANCE SUMMARY -->
+    <!-- 2 COLUMN BOX GRID -->
+    <div class="card-grid" id="ranking-list">
+      <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
+    </div>
+
+    <!-- TOTAL PERFORMANCE SUMMARY (MOVED TO BOTTOM) -->
     <div class="summary-card" id="summary-box">
       <div class="summary-title" id="summary-cat-title">TOTAL KAARKARDAGI (ALL)</div>
       <div class="summary-total" id="total-amount">₹0</div>
@@ -296,10 +302,6 @@
       </div>
     </div>
 
-    <!-- 2 COLUMN BOX GRID -->
-    <div class="card-grid" id="ranking-list">
-      <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
-    </div>
   </div>
 
 </div>
