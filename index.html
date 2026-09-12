@@ -318,7 +318,7 @@
       margin-bottom: 5px;
     }
     .summary-details {
-      font-size: 13px;
+      font-size: 12px;
       color: #c9d1d9;
       display: flex;
       justify-content: space-around;
@@ -383,8 +383,9 @@
       <div class="summary-title" id="summary-cat-title">TOTAL KAARKARDAGI (ALL)</div>
       <div class="summary-total" id="total-amount">₹0</div>
       <div class="summary-details">
-        <span>👥 Total Staff: <strong id="total-staff" style="color:#58a6ff;">0</strong></span>
-        <span>📦 Total Units: <strong id="total-units" style="color:#ffb703;">0</strong></span>
+        <span>👥 Total: <strong id="total-staff" style="color:#58a6ff;">0</strong></span>
+        <span>⚡ Active Today: <strong id="active-staff" style="color:#2ea043;">0</strong></span>
+        <span>📦 Units: <strong id="total-units" style="color:#ffb703;">0</strong></span>
       </div>
     </div>
 
@@ -487,7 +488,7 @@
       matchRotationTimer = setInterval(() => {
         currentMatchIndex = (currentMatchIndex + 1) % matchKeys.length;
         renderCurrentMatch();
-      }, 10000); // Rotates every 10 seconds
+      }, 10000);
     }
   }
 
@@ -545,14 +546,20 @@
 
     let totalAmt = 0;
     let totalUn = 0;
+    let activeStaffCount = 0;
+
     filtered.forEach(item => {
       totalAmt += item.count;
       totalUn += item.unit;
+      if (item.todayAmt > 0) {
+        activeStaffCount++;
+      }
     });
 
     document.getElementById("summary-cat-title").innerText = `TOTAL KAARKARDAGI (${currentCategory})`;
     document.getElementById("total-amount").innerText = `₹${totalAmt.toLocaleString('en-IN')}`;
     document.getElementById("total-staff").innerText = filtered.length;
+    document.getElementById("active-staff").innerText = activeStaffCount;
     document.getElementById("total-units").innerText = totalUn.toFixed(2);
 
     filtered.sort((a, b) => b.count - a.count);
