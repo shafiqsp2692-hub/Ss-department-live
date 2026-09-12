@@ -356,7 +356,7 @@
 
     <!-- TEAM MATCH CARD SECTION -->
     <div class="match-card-wrapper" id="match-box">
-      <div class="match-title-header">⚔️ TEAM MATCH RESULT ⚔️</div>
+      <div class="match-title-header" id="match-title-text">⚔️ TEAM MATCH RESULT ⚔️</div>
       <div class="match-versus-grid" id="match-grid-content">
         <!-- Dynamic Match Data -->
       </div>
@@ -395,6 +395,10 @@
 <script>
   let allData = [];
   let currentCategory = 'ALL';
+  let matchGroups = {};
+  let matchKeys = [];
+  let currentMatchIndex = 0;
+  let matchRotationTimer = null;
 
   function checkLogin() {
     var user = document.getElementById("username").value.trim();
@@ -423,7 +427,7 @@
       .then(csvText => {
         const rows = csvText.split('\n').map(row => row.split(','));
         allData = [];
-        let matchMembers = [];
+        matchGroups = {};
 
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
@@ -432,21 +436,24 @@
             let unit = rows[i][2] ? parseFloat(rows[i][2].replace(/"/g, '').trim()) || 0 : 0;
             let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
             let todayAmt = rows[i][4] ? parseInt(rows[i][4].replace(/"/g, '').trim()) || 0 : 0;
-            // Column G is index 6
             let matchTag = rows[i][6] ? rows[i][6].replace(/"/g, '').trim().toUpperCase() : '';
             
             if (name) {
               let item = { name, count, unit, category, todayAmt, matchTag };
               allData.push(item);
 
-              if (matchTag === 'MATCH' || matchTag === 'YES') {
-                matchMembers.push(item);
+              if (matchTag.startsWith('MATCH') || matchTag === 'YES') {
+                let tagKey = (matchTag === 'MATCH' || matchTag === 'YES') ? 'MATCH1' : matchTag;
+                if (!matchGroups[tagKey]) {
+                  matchGroups[tagKey] = [];
+                }
+                matchGroups[tagKey].push(item);
               }
             }
           }
         }
 
-        renderMatchCard(matchMembers);
+        setupMatchesRotation();
         renderCards();
       })
       .catch(err => {
@@ -455,23 +462,50 @@
       });
   }
 
-  function renderMatchCard(members) {
-    const matchBox = document.getElementById("match-box");
-    const gridContent = document.getElementById("match-grid-content");
-    const diffVal = document.getElementById("match-diff-val");
+  function setupMatchesRotation() {
+    matchKeys = Object.keys(matchGroups).filter(key => matchGroups[key].length >= 2);
 
-    if (members.length < 2) {
-      matchBox.style.display = "none";
+    if (matchRotationTimer) {
+      clearInterval(matchRotationTimer);
+      matchRotationTimer = null;
+    }
+
+    if (matchKeys.length === 0) {
+      document.getElementById("match-box").style.display = "none";
       return;
     }
 
-    matchBox.style.display = "block";
+    document.getElementById("match-box").style.display = "block";
+    
+    if (currentMatchIndex >= matchKeys.length) {
+      currentMatchIndex = 0;
+    }
+
+    renderCurrentMatch();
+
+    if (matchKeys.length > 1) {
+      matchRotationTimer = setInterval(() => {
+        currentMatchIndex = (currentMatchIndex + 1) % matchKeys.length;
+        renderCurrentMatch();
+      }, 10000); // Rotates every 10 seconds
+    }
+  }
+
+  function renderCurrentMatch() {
+    if (matchKeys.length === 0) return;
+
+    let key = matchKeys[currentMatchIndex];
+    let members = [...matchGroups[key]];
     members.sort((a, b) => b.count - a.count);
 
     let winner = members[0];
     let runner = members[1];
     let diff = winner.count - runner.count;
 
+    let matchLabel = matchKeys.length > 1 ? `⚔️ TEAM MATCH (${key}) ⚔️` : `⚔️ TEAM MATCH RESULT ⚔️`;
+    document.getElementById("match-title-text").innerText = matchLabel;
+
+    const gridContent = document.getElementById("match-grid-content");
     gridContent.innerHTML = `
       <div class="match-user-box winner">
         <div class="match-user-name">👑 ${winner.name}</div>
@@ -484,7 +518,7 @@
       </div>
     `;
 
-    diffVal.innerText = `₹${diff.toLocaleString('en-IN')}`;
+    document.getElementById("match-diff-val").innerText = `₹${diff.toLocaleString('en-IN')}`;
   }
 
   function filterCategory(cat) {
