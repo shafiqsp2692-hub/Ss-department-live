@@ -89,6 +89,81 @@
       margin-bottom: 15px;
     }
 
+    /* TEAM MATCH SECTION */
+    .match-card-wrapper {
+      background: #161b22;
+      border: 1.5px solid #238636;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 10px rgba(35, 134, 54, 0.25);
+      display: none;
+    }
+    .match-title-header {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #ffb703;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed #30363d;
+      padding-bottom: 6px;
+    }
+    .match-versus-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .match-user-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .match-user-box.winner {
+      border: 1.5px solid #ffd700;
+      background: #1c1a00;
+    }
+    .match-user-name {
+      font-size: 13px;
+      font-weight: bold;
+      color: #f0f6fc;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .match-user-amt {
+      font-size: 15px;
+      font-weight: 800;
+      color: #3fb950;
+    }
+    .match-user-box.winner .match-user-amt {
+      color: #ffd700;
+    }
+    .winner-tag {
+      font-size: 10px;
+      font-weight: bold;
+      color: #000;
+      background: #ffd700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .match-diff-footer {
+      text-align: center;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #30363d;
+      font-size: 13px;
+      color: #8b949e;
+      font-weight: bold;
+    }
+    .match-diff-footer strong {
+      color: #ffb703;
+      font-size: 14px;
+    }
+
     /* CATEGORY TAB BUTTONS */
     .tab-container {
       display: flex;
@@ -134,14 +209,14 @@
       transition: all 0.3s ease;
     }
 
-    /* TODAY UPDATED HIGHLIGHT (LIGHT COLOR BOX) */
+    /* TODAY UPDATED HIGHLIGHT */
     .box-card.today-updated {
       background: #1b2a1e !important;
       border: 1.5px solid #2ea043 !important;
       box-shadow: 0 0 10px rgba(46, 160, 67, 0.3);
     }
 
-    /* SPECIAL STYLING FOR TOP 1 (FIRST RANK) */
+    /* SPECIAL STYLING FOR TOP 1 */
     .box-card.top1 {
       grid-column: span 2;
       border: 2px solid #ffd700;
@@ -218,7 +293,7 @@
       border-radius: 10px;
     }
 
-    /* SUMMARY CARD (MOVED TO BOTTOM) */
+    /* SUMMARY CARD (BOTTOM) */
     .summary-card {
       background: #161b22;
       border: 1px solid #238636;
@@ -279,6 +354,17 @@
       ✏️ Edit Data in Google Sheet
     </a>
 
+    <!-- TEAM MATCH CARD SECTION -->
+    <div class="match-card-wrapper" id="match-box">
+      <div class="match-title-header">⚔️ TEAM MATCH RESULT ⚔️</div>
+      <div class="match-versus-grid" id="match-grid-content">
+        <!-- Dynamic Match Data -->
+      </div>
+      <div class="match-diff-footer" id="match-diff-content">
+        Difference: <strong id="match-diff-val">₹0</strong>
+      </div>
+    </div>
+
     <!-- FILTER TABS -->
     <div class="tab-container">
       <button id="tab-all" class="tab-btn active" onclick="filterCategory('ALL')">ALL</button>
@@ -292,7 +378,7 @@
       <p style="text-align:center; grid-column: span 2;">Loading live data...</p>
     </div>
 
-    <!-- TOTAL PERFORMANCE SUMMARY (MOVED TO BOTTOM) -->
+    <!-- TOTAL PERFORMANCE SUMMARY -->
     <div class="summary-card" id="summary-box">
       <div class="summary-title" id="summary-cat-title">TOTAL KAARKARDAGI (ALL)</div>
       <div class="summary-total" id="total-amount">₹0</div>
@@ -337,6 +423,7 @@
       .then(csvText => {
         const rows = csvText.split('\n').map(row => row.split(','));
         allData = [];
+        let matchMembers = [];
 
         for (let i = 1; i < rows.length; i++) {
           if (rows[i].length >= 2) {
@@ -345,19 +432,59 @@
             let unit = rows[i][2] ? parseFloat(rows[i][2].replace(/"/g, '').trim()) || 0 : 0;
             let category = rows[i][3] ? rows[i][3].replace(/"/g, '').trim().toUpperCase() : '';
             let todayAmt = rows[i][4] ? parseInt(rows[i][4].replace(/"/g, '').trim()) || 0 : 0;
+            // Column G is index 6
+            let matchTag = rows[i][6] ? rows[i][6].replace(/"/g, '').trim().toUpperCase() : '';
             
             if (name) {
-              allData.push({ name, count, unit, category, todayAmt });
+              let item = { name, count, unit, category, todayAmt, matchTag };
+              allData.push(item);
+
+              if (matchTag === 'MATCH' || matchTag === 'YES') {
+                matchMembers.push(item);
+              }
             }
           }
         }
 
+        renderMatchCard(matchMembers);
         renderCards();
       })
       .catch(err => {
         console.error(err);
         document.getElementById("ranking-list").innerHTML = "<p style='text-align:center; color:red; grid-column: span 2;'>Failed to load Google Sheet data.</p>";
       });
+  }
+
+  function renderMatchCard(members) {
+    const matchBox = document.getElementById("match-box");
+    const gridContent = document.getElementById("match-grid-content");
+    const diffVal = document.getElementById("match-diff-val");
+
+    if (members.length < 2) {
+      matchBox.style.display = "none";
+      return;
+    }
+
+    matchBox.style.display = "block";
+    members.sort((a, b) => b.count - a.count);
+
+    let winner = members[0];
+    let runner = members[1];
+    let diff = winner.count - runner.count;
+
+    gridContent.innerHTML = `
+      <div class="match-user-box winner">
+        <div class="match-user-name">👑 ${winner.name}</div>
+        <div class="match-user-amt">₹${winner.count.toLocaleString('en-IN')}</div>
+        <div class="winner-tag">WINNER</div>
+      </div>
+      <div class="match-user-box">
+        <div class="match-user-name">${runner.name}</div>
+        <div class="match-user-amt">₹${runner.count.toLocaleString('en-IN')}</div>
+      </div>
+    `;
+
+    diffVal.innerText = `₹${diff.toLocaleString('en-IN')}`;
   }
 
   function filterCategory(cat) {
